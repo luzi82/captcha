@@ -232,7 +232,8 @@ class ImageCaptcha(_Captcha):
 
         for im, neg_off in zip(images,neg_off_list):
             w, h = im.size
-            mask = im.convert('L').point(table)
+            #mask = im.convert('L').point(table)
+            mask = im.split()[3]
             image.paste(im, (offset, int((self._height - h) / 2)), mask)
             offset = offset + w + neg_off
 
@@ -248,7 +249,7 @@ class ImageCaptcha(_Captcha):
         """
         background = random_color()
         color = random_color(background,64)
-        color = color[:-1] + (random.randint(128,255),)
+        #color = color[:-1] + (random.randint(128,255),)
         dot_count   = random.randint(0,40)
         curve_count = random.randint(0,10)
         
