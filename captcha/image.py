@@ -133,7 +133,7 @@ class ImageCaptcha(_Captcha):
         w, h = image.size
         x1 = random.randint(0, int(w / 2))
         x2 = random.randint(w - int(w / 2), w)
-        if random.random() < 0.5: # down
+        if rand_bool(): # down
             y1 = random.randint(0, int(h / 2))
             y2 = random.randint(h - int(h / 2), h)
             y1 += y1-y2
@@ -249,13 +249,15 @@ class ImageCaptcha(_Captcha):
         color = random_color(background,64)
         color = color[:-1] + (random.randint(128,255),)
         curve_count = random.randint(0,10)
+        curve_count = random.randint(0,10)
         
         im = self.create_captcha_background(background)
         im = self.create_captcha_text(im, chars, color)
         self.create_noise_dots(im, color)
         for _ in range(curve_count):
-            self.create_noise_curve(im, color)
-        im = im.filter(ImageFilter.SMOOTH)
+            self.create_noise_curve(im, color if rand_bool() else random_color())
+        if rand_bool():
+            im = im.filter(ImageFilter.SMOOTH)
         return im
 
 
@@ -269,3 +271,6 @@ def random_color(avoid_color=None, min_radius=None):
         radius2 = sum(diff2)
         if radius2 >= min_radius*min_radius:
             return ret
+
+def rand_bool():
+    return random.random()<0.5
