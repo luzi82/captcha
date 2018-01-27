@@ -240,10 +240,13 @@ class ImageCaptcha(_Captcha):
         background = random_color()
         color = random_color(background,64)
         color = color[:-1] + (random.randint(128,255),)
+        curve_count = random.randint(0,10)
+        
         im = self.create_captcha_background(background)
         im = self.create_captcha_text(im, chars, color)
         self.create_noise_dots(im, color)
-        self.create_noise_curve(im, color)
+        for _ in range(curve_count):
+            self.create_noise_curve(im, color)
         im = im.filter(ImageFilter.SMOOTH)
         return im
 
