@@ -187,8 +187,8 @@ class ImageCaptcha(_Captcha):
 
             dx = random.randint(0, 4)
             dy = random.randint(0, 6)
-            im = Image.new('RGBA', (w + dx, h + dy))
-            Draw(im).text((dx, dy), c, font=font, fill=color)
+            im = Image.new('L', (w + dx, h + dy), 0)
+            Draw(im).text((dx, dy), c, font=font, fill=255)
 
             # rotate
             im = im.crop(im.getbbox())
@@ -234,7 +234,7 @@ class ImageCaptcha(_Captcha):
             w, h = im.size
             #mask = im.convert('L').point(table)
             rgb_img = Image.new('RGB', im.size, color)
-            mask = im.split()[3]
+            mask = im
             image.paste(rgb_img, (offset, int((self._height - h) / 2)), mask)
             offset = offset + w + neg_off
 
