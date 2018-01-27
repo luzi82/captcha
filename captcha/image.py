@@ -113,6 +113,10 @@ class ImageCaptcha(_Captcha):
         self._font_sizes = font_sizes or (42, 50, 56)
         self._truefonts = []
 
+    def set_size(self, width, height):
+        self._width = width
+        self._height = height
+
     @property
     def truefonts(self):
         if self._truefonts:
