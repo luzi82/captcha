@@ -237,8 +237,9 @@ class ImageCaptcha(_Captcha):
 
         :param chars: text to be generated.
         """
-        background = random_color(238, 255)
-        color = random_color(10, 200, random.randint(220, 255))
+        background = random_color()
+        color = random_color(background,64)
+        color = color[:-1] + (random.randint(128,255),)
         im = self.create_captcha_background(background)
         im = self.create_captcha_text(im, chars, color)
         self.create_noise_dots(im, color)
@@ -247,10 +248,13 @@ class ImageCaptcha(_Captcha):
         return im
 
 
-def random_color(start, end, opacity=None):
-    red = random.randint(start, end)
-    green = random.randint(start, end)
-    blue = random.randint(start, end)
-    if opacity is None:
-        return (red, green, blue)
-    return (red, green, blue, opacity)
+def random_color(avoid_color=None, min_radius=None):
+    while(True):
+        ret = (random.randint(0, 255),random.randint(0, 255),random.randint(0, 255),255)
+        if avoid_color is None:
+            return ret
+        diff = [a-b for a,b in zip(ret, avoid_color)]
+        diff2 = [d*d for d in diff]
+        radius2 = sum(diff2)
+        if radius2 >= min_radius*min_radius:
+            return ret
