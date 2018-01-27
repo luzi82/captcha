@@ -131,13 +131,21 @@ class ImageCaptcha(_Captcha):
     @staticmethod
     def create_noise_curve(image, color):
         w, h = image.size
-        x1 = random.randint(0, int(w / 5))
-        x2 = random.randint(w - int(w / 5), w)
-        y1 = random.randint(int(h / 5), h - int(h / 5))
-        y2 = random.randint(y1, h - int(h / 5))
+        x1 = random.randint(0, int(w / 2))
+        x2 = random.randint(w - int(w / 2), w)
+        if random.random() < 0.5: # down
+            y1 = random.randint(0, int(h / 2))
+            y2 = random.randint(h - int(h / 2), h)
+            y1 += y1-y2
+            end = random.randint(90, 180)
+            start = random.randint(0, 90)
+        else: # down
+            y1 = random.randint(0, int(h / 2))
+            y2 = random.randint(h - int(h / 2), h)
+            y2 += y2-y1
+            end = random.randint(270, 360)
+            start = random.randint(180, 270)
         points = [x1, y1, x2, y2]
-        end = random.randint(160, 200)
-        start = random.randint(0, 20)
         Draw(image).arc(points, start, end, fill=color)
         return image
 
