@@ -150,14 +150,15 @@ class ImageCaptcha(_Captcha):
         return image
 
     @staticmethod
-    def create_noise_dots(image, color, width=3, number=30):
+    def create_noise_dots(image, color, width=2, number=30):
         draw = Draw(image)
         w, h = image.size
-        while number:
-            x1 = random.randint(0, w)
-            y1 = random.randint(0, h)
-            draw.line(((x1, y1), (x1 - 1, y1 - 1)), fill=color, width=width)
-            number -= 1
+        for _ in range(number):
+            x = random.randint(0, w)
+            y = random.randint(0, h)
+            rx = random.randint(1,width)
+            ry = random.randint(1,width)
+            draw.ellipse(((x-rx,y-ry), (x+rx,y+ry)), fill=color if rand_bool() else random_color())
         return image
 
     def create_captcha_background(self, background):
@@ -248,11 +249,12 @@ class ImageCaptcha(_Captcha):
         background = random_color()
         color = random_color(background,64)
         color = color[:-1] + (random.randint(128,255),)
+        dot_count   = random.randint(0,40)
         curve_count = random.randint(0,10)
         
         im = self.create_captcha_background(background)
         im = self.create_captcha_text(im, chars, color)
-        self.create_noise_dots(im, color)
+        self.create_noise_dots(im, color, number=dot_count)
         for _ in range(curve_count):
             self.create_noise_curve(im, color if rand_bool() else random_color())
         if rand_bool():
