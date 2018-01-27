@@ -152,16 +152,24 @@ class ImageCaptcha(_Captcha):
             number -= 1
         return image
 
-    def create_captcha_image(self, chars, color, background):
-        """Create the CAPTCHA image itself.
+    def create_captcha_background(self, background):
+        """Create the CAPTCHA background.
 
-        :param chars: text to be generated.
-        :param color: color of the text.
         :param background: color of the background.
 
         The color should be a tuple of 3 numbers, such as (0, 255, 255).
         """
         image = Image.new('RGB', (self._width, self._height), background)
+        return image
+
+    def create_captcha_text(self, image, chars, color):
+        """Create the CAPTCHA image itself.
+
+        :param chars: text to be generated.
+        :param color: color of the text.
+
+        The color should be a tuple of 3 numbers, such as (0, 255, 255).
+        """
         draw = Draw(image)
 
         def _draw_character(c):
@@ -217,7 +225,7 @@ class ImageCaptcha(_Captcha):
 
         if width > self._width:
             image = image.resize((self._width, self._height))
-
+        
         return image
 
     def generate_image(self, chars):
@@ -227,7 +235,8 @@ class ImageCaptcha(_Captcha):
         """
         background = random_color(238, 255)
         color = random_color(10, 200, random.randint(220, 255))
-        im = self.create_captcha_image(chars, color, background)
+        im = self.create_captcha_background(background)
+        im = self.create_captcha_text(im, chars, color)
         self.create_noise_dots(im, color)
         self.create_noise_curve(im, color)
         im = im.filter(ImageFilter.SMOOTH)
