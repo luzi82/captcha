@@ -216,13 +216,16 @@ class ImageCaptcha(_Captcha):
         average = int(text_width / len(chars))
         rand = int(0.25 * average)
         offset = int(average * 0.1)
-        offset += random.randint(0,width-text_width)
 
-        for im in images:
+        neg_off_list = [ random.randint(-rand, 0) for _ in images ]
+        offset_max = max(0,width-text_width-sum(neg_off_list[:-1])-offset*2)
+        offset += random.randint(0,offset_max)
+
+        for im, neg_off in zip(images,neg_off_list):
             w, h = im.size
             mask = im.convert('L').point(table)
             image.paste(im, (offset, int((self._height - h) / 2)), mask)
-            offset = offset + w + random.randint(-rand, 0)
+            offset = offset + w + neg_off
 
         if width != self._width:
             image = image.resize((self._width, self._height))
