@@ -249,7 +249,6 @@ class ImageCaptcha(_Captcha):
         color = random_color(background,64)
         color = color[:-1] + (random.randint(128,255),)
         curve_count = random.randint(0,10)
-        curve_count = random.randint(0,10)
         
         im = self.create_captcha_background(background)
         im = self.create_captcha_text(im, chars, color)
