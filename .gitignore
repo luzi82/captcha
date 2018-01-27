@@ -18,3 +18,4 @@ cover/
 *.so
 venv/
 /.project
+/output
