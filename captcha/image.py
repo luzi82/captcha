@@ -233,8 +233,9 @@ class ImageCaptcha(_Captcha):
         for im, neg_off in zip(images,neg_off_list):
             w, h = im.size
             #mask = im.convert('L').point(table)
+            rgb_img = Image.new('RGB', im.size, color)
             mask = im.split()[3]
-            image.paste(im, (offset, int((self._height - h) / 2)), mask)
+            image.paste(rgb_img, (offset, int((self._height - h) / 2)), mask)
             offset = offset + w + neg_off
 
         if width != self._width:
