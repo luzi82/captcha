@@ -177,8 +177,8 @@ class ImageCaptcha(_Captcha):
             for y in range(chunk[1]):
                 draw.point((x,y),random_color(background_avoid,64))
         big_side = math.ceil((self._width*self._width+self._height*self._height)**0.5)+4
-        image = image.resize((big_side, big_side),Image.BILINEAR)
-        image = image.rotate(random.random()*360, Image.BILINEAR)
+        image = image.resize((big_side, big_side),random.choice([Image.NEAREST,Image.BILINEAR]))
+        image = image.rotate(random.random()*360, random.choice([Image.NEAREST,Image.BILINEAR]))
         crop_x0 = int((big_side-self._width)/2)
         crop_y0 = int((big_side-self._height)/2)
         crop_x1 = crop_x0 + self._width
