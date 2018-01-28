@@ -20,6 +20,7 @@ try:
     from wheezy.captcha import image as wheezy_captcha
 except ImportError:
     wheezy_captcha = None
+import math
 
 DATA_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
 DEFAULT_FONTS = [os.path.join(DATA_DIR, 'DroidSansMono.ttf')]
@@ -161,19 +162,28 @@ class ImageCaptcha(_Captcha):
             draw.ellipse(((x,y), (x+xx,y+yy)), fill=color if rand_bool() else random_color())
         return image
 
-    def create_captcha_background(self, background_avoid, chunk):
+    def create_captcha_background(self, background_avoid):
         """Create the CAPTCHA background.
 
         :param background: color of the background.
 
         The color should be a tuple of 3 numbers, such as (0, 255, 255).
         """
+        chunk_max = max(1,int(max(self._width, self._height)/10))
+        chunk = random.randint(1,chunk_max), random.randint(1,chunk_max)
         image = Image.new('RGB', chunk, (0,0,0))
         draw = Draw(image)
         for x in range(chunk[0]):
             for y in range(chunk[1]):
                 draw.point((x,y),random_color(background_avoid,64))
-        image = image.resize((self._width, self._height),Image.BILINEAR)
+        big_side = math.ceil((self._width*self._width+self._height*self._height)**0.5)+4
+        image = image.resize((big_side, big_side),Image.BILINEAR)
+        image = image.rotate(random.random()*360, Image.BILINEAR)
+        crop_x0 = int((big_side-self._width)/2)
+        crop_y0 = int((big_side-self._height)/2)
+        crop_x1 = crop_x0 + self._width
+        crop_y1 = crop_y0 + self._height
+        image = image.crop((crop_x0,crop_y0,crop_x1,crop_y1))
         return image
 
     def create_captcha_text(self, image, chars, color, back_color=None, back_color_count=0, back_radius=0):
@@ -273,13 +283,13 @@ class ImageCaptcha(_Captcha):
         back_color = random_color(color,64)
         back_color_count = random.randint(1,10) if rand_bool() else 0
         background_avoid_color = color if back_color_count == 0 else None
-        background_chunk_x = random.randint(1,max(1,int(self._width / 10)))
-        background_chunk_y = random.randint(1,max(1,int(self._height / 10)))
+        #background_chunk_x = random.randint(1,max(1,int(self._width / 10)))
+        #background_chunk_y = random.randint(1,max(1,int(self._height / 10)))
         #color = color[:-1] + (random.randint(128,255),)
         dot_count   = random.randint(0,40)
         curve_count = random.randint(0,10)
         
-        im = self.create_captcha_background(background_avoid_color,(background_chunk_x,background_chunk_y))
+        im = self.create_captcha_background(background_avoid_color)
         im = self.create_captcha_text(im, chars, color, back_color, back_color_count, 5)
         self.create_noise_dots(im, color, number=dot_count)
         for _ in range(curve_count):
