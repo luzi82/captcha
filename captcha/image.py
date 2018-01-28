@@ -223,7 +223,7 @@ class ImageCaptcha(_Captcha):
         image = image.resize((width, self._height))
 
         average = int(text_width / len(chars))
-        rand = int(0.25 * average)
+        rand = int(0.35 * average)
         offset0 = int(average * 0.1)
 
         neg_off_list = [ random.randint(-rand, 0) for _ in images ]
