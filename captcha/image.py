@@ -227,27 +227,29 @@ class ImageCaptcha(_Captcha):
         offset0 = int(average * 0.1)
 
         neg_off_list = [ random.randint(-rand, 0) for _ in images ]
+        y_max_list = [ self._height-im.size[1] for im in images ]
+        y_list = [ (random.randint(0,y) if (y >= 0) else int(y/2)) for y in y_max_list ]
         offset0_max = max(0,width-text_width-sum(neg_off_list[:-1])-offset0*2)
         offset0 += random.randint(0,offset0_max)
 
         for _ in range(back_color_count):
-            x,y = tuple(int(i*back_radius) for i in random_vector(2))
+            xs,ys = tuple(int(i*back_radius) for i in random_vector(2))
             offset=offset0
-            for im, neg_off in zip(images,neg_off_list):
+            for im, neg_off, y in zip(images,neg_off_list,y_list):
                 w, h = im.size
                 #mask = im.convert('L').point(table)
                 rgb_img = Image.new('RGB', im.size, back_color)
                 mask = im
-                image.paste(rgb_img, (offset+x, int((self._height - h) / 2)+y), mask)
+                image.paste(rgb_img, (offset+xs, y+ys), mask)
                 offset = offset + w + neg_off
 
         offset=offset0
-        for im, neg_off in zip(images,neg_off_list):
+        for im, neg_off, y in zip(images,neg_off_list,y_list):
             w, h = im.size
             #mask = im.convert('L').point(table)
             rgb_img = Image.new('RGB', im.size, color)
             mask = im
-            image.paste(rgb_img, (offset, int((self._height - h) / 2)), mask)
+            image.paste(rgb_img, (offset, y), mask)
             offset = offset + w + neg_off
 
         if width != self._width:
