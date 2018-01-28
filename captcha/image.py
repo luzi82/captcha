@@ -207,7 +207,8 @@ class ImageCaptcha(_Captcha):
 
             # rotate
             im = im.crop(im.getbbox())
-            im = im.rotate(random.uniform(-30, 30), Image.BILINEAR, expand=1)
+            im = im.rotate(random.uniform(-30, 30), Image.BILINEAR, expand=max(im.size))
+            im = im.crop(im.getbbox())
 
             # warp
             w, h = im.size
