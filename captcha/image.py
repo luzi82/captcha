@@ -171,7 +171,7 @@ class ImageCaptcha(_Captcha):
         image = Image.new('RGB', (self._width, self._height), background)
         return image
 
-    def create_captcha_text(self, image, chars, color):
+    def create_captcha_text(self, image, chars, color, back_color=None, back_color_count=0, back_radius=0):
         """Create the CAPTCHA image itself.
 
         :param chars: text to be generated.
@@ -224,12 +224,24 @@ class ImageCaptcha(_Captcha):
 
         average = int(text_width / len(chars))
         rand = int(0.25 * average)
-        offset = int(average * 0.1)
+        offset0 = int(average * 0.1)
 
         neg_off_list = [ random.randint(-rand, 0) for _ in images ]
-        offset_max = max(0,width-text_width-sum(neg_off_list[:-1])-offset*2)
-        offset += random.randint(0,offset_max)
+        offset0_max = max(0,width-text_width-sum(neg_off_list[:-1])-offset0*2)
+        offset0 += random.randint(0,offset0_max)
 
+        for _ in range(back_color_count):
+            x,y = tuple(int(i*back_radius) for i in random_vector(2))
+            offset=offset0
+            for im, neg_off in zip(images,neg_off_list):
+                w, h = im.size
+                #mask = im.convert('L').point(table)
+                rgb_img = Image.new('RGB', im.size, back_color)
+                mask = im
+                image.paste(rgb_img, (offset+x, int((self._height - h) / 2)+y), mask)
+                offset = offset + w + neg_off
+
+        offset=offset0
         for im, neg_off in zip(images,neg_off_list):
             w, h = im.size
             #mask = im.convert('L').point(table)
@@ -248,14 +260,19 @@ class ImageCaptcha(_Captcha):
 
         :param chars: text to be generated.
         """
-        background = random_color()
-        color = random_color(background,64)
+        color = random_color()
+        back_color = random_color(color,64)
+        back_color_count = random.randint(1,10) if rand_bool() else 0
+        if back_color_count == 0:
+            background = random_color(color,64)
+        else:
+            background = random_color()
         #color = color[:-1] + (random.randint(128,255),)
         dot_count   = random.randint(0,40)
         curve_count = random.randint(0,10)
         
         im = self.create_captcha_background(background)
-        im = self.create_captcha_text(im, chars, color)
+        im = self.create_captcha_text(im, chars, color, back_color, back_color_count, 5)
         self.create_noise_dots(im, color, number=dot_count)
         for _ in range(curve_count):
             self.create_noise_curve(im, color if rand_bool() else random_color())
@@ -277,3 +294,10 @@ def random_color(avoid_color=None, min_radius=None):
 
 def rand_bool():
     return random.random()<0.5
+
+def random_vector(ndim):
+    while True:
+        ret = tuple((random.random()*2-1) for _ in range(ndim))
+        norm2 = sum((r*r) for r in ret)
+        if norm2 <= 1:
+            return ret
