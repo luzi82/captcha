@@ -200,6 +200,7 @@ class ImageCaptcha(_Captcha):
             im = im.rotate(random.uniform(-30, 30), Image.BILINEAR, expand=1)
 
             # warp
+            w, h = im.size
             dx = w * random.uniform(0.1, 0.3)
             dy = h * random.uniform(0.2, 0.3)
             x1 = int(random.uniform(-dx, dx))
@@ -216,6 +217,7 @@ class ImageCaptcha(_Captcha):
             )
             im = im.resize((w2, h2))
             im = im.transform((w, h), Image.QUAD, data)
+            im = im.crop(im.getbbox())
             return im
 
         images = []
