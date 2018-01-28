@@ -161,14 +161,19 @@ class ImageCaptcha(_Captcha):
             draw.ellipse(((x,y), (x+xx,y+yy)), fill=color if rand_bool() else random_color())
         return image
 
-    def create_captcha_background(self, background):
+    def create_captcha_background(self, background_avoid, chunk):
         """Create the CAPTCHA background.
 
         :param background: color of the background.
 
         The color should be a tuple of 3 numbers, such as (0, 255, 255).
         """
-        image = Image.new('RGB', (self._width, self._height), background)
+        image = Image.new('RGB', chunk, (0,0,0))
+        draw = Draw(image)
+        for x in range(chunk[0]):
+            for y in range(chunk[1]):
+                draw.point((x,y),random_color(background_avoid,64))
+        image = image.resize((self._width, self._height),Image.BILINEAR)
         return image
 
     def create_captcha_text(self, image, chars, color, back_color=None, back_color_count=0, back_radius=0):
@@ -265,15 +270,14 @@ class ImageCaptcha(_Captcha):
         color = random_color()
         back_color = random_color(color,64)
         back_color_count = random.randint(1,10) if rand_bool() else 0
-        if back_color_count == 0:
-            background = random_color(color,64)
-        else:
-            background = random_color()
+        background_avoid_color = color if back_color_count == 0 else None
+        background_chunk_x = random.randint(1,max(1,int(self._width / 10)))
+        background_chunk_y = random.randint(1,max(1,int(self._height / 10)))
         #color = color[:-1] + (random.randint(128,255),)
         dot_count   = random.randint(0,40)
         curve_count = random.randint(0,10)
         
-        im = self.create_captcha_background(background)
+        im = self.create_captcha_background(background_avoid_color,(background_chunk_x,background_chunk_y))
         im = self.create_captcha_text(im, chars, color, back_color, back_color_count, 5)
         self.create_noise_dots(im, color, number=dot_count)
         for _ in range(curve_count):
