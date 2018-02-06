@@ -194,6 +194,9 @@ class ImageCaptcha(_Captcha):
 
         The color should be a tuple of 3 numbers, such as (0, 255, 255).
         """
+        if len(chars) <= 0:
+            return image
+        
         draw = Draw(image)
 
         def _draw_character(c):
