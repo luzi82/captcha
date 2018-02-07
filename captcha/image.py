@@ -114,6 +114,12 @@ class ImageCaptcha(_Captcha):
         self._font_sizes = font_sizes or (42, 50, 56)
         self._truefonts = []
 
+        self._enable_back_text = True
+        self._enable_background_noise = True
+        self._enable_noise_bg = True
+        self._enable_noise_dot = True
+        self._enable_noise_curve = True
+
     def set_size(self, width, height):
         self._width = width
         self._height = height
@@ -169,7 +175,7 @@ class ImageCaptcha(_Captcha):
 
         The color should be a tuple of 3 numbers, such as (0, 255, 255).
         """
-        chunk_max = max(1,int(max(self._width, self._height)/10))
+        chunk_max = max(1,int(max(self._width, self._height)/10)) if self._enable_background_noise else 1
         chunk = random.randint(1,chunk_max), random.randint(1,chunk_max)
         image = Image.new('RGB', chunk, (0,0,0))
         draw = Draw(image)
@@ -285,13 +291,13 @@ class ImageCaptcha(_Captcha):
         """
         color = random_color()
         back_color = random_color(color,64)
-        back_color_count = random.randint(1,10) if rand_bool() else 0
+        back_color_count = random.randint(1,10) if (self._enable_back_text and rand_bool()) else 0
         background_avoid_color = color if back_color_count == 0 else None
         #background_chunk_x = random.randint(1,max(1,int(self._width / 10)))
         #background_chunk_y = random.randint(1,max(1,int(self._height / 10)))
         #color = color[:-1] + (random.randint(128,255),)
-        dot_count   = random.randint(0,40)
-        curve_count = random.randint(0,10)
+        dot_count   = random.randint(0,40) if self._enable_noise_dot else 0
+        curve_count = random.randint(0,10) if self._enable_noise_curve else 0
         
         im = self.create_captcha_background(background_avoid_color)
         im = self.create_captcha_text(im, chars, color, back_color, back_color_count, 5)
