@@ -293,9 +293,6 @@ class ImageCaptcha(_Captcha):
         back_color = random_color(color,64)
         back_color_count = random.randint(1,10) if (self._enable_back_text and rand_bool()) else 0
         background_avoid_color = color if back_color_count == 0 else None
-        #background_chunk_x = random.randint(1,max(1,int(self._width / 10)))
-        #background_chunk_y = random.randint(1,max(1,int(self._height / 10)))
-        #color = color[:-1] + (random.randint(128,255),)
         dot_count   = random.randint(0,40) if self._enable_noise_dot else 0
         curve_count = random.randint(0,10) if self._enable_noise_curve else 0
         
