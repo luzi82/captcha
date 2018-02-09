@@ -119,6 +119,7 @@ class ImageCaptcha(_Captcha):
         self._enable_noise_bg = True
         self._enable_noise_dot = True
         self._enable_noise_curve = True
+        self._enable_panda = False
 
     def set_size(self, width, height):
         self._width = width
@@ -181,7 +182,8 @@ class ImageCaptcha(_Captcha):
         draw = Draw(image)
         for x in range(chunk[0]):
             for y in range(chunk[1]):
-                draw.point((x,y),random_color(background_avoid,64))
+                color = random_color(background_avoid,64) if not self._enable_panda else (0,0,0,255)
+                draw.point((x,y),color)
         big_side = math.ceil((self._width*self._width+self._height*self._height)**0.5)+4
         image = image.resize((big_side, big_side),random.choice([Image.NEAREST,Image.BILINEAR]))
         image = image.rotate(random.random()*360, random.choice([Image.NEAREST,Image.BILINEAR]))
@@ -289,8 +291,8 @@ class ImageCaptcha(_Captcha):
 
         :param chars: text to be generated.
         """
-        color = random_color()
-        back_color = random_color(color,64)
+        color = random_color() if not self._enable_panda else (255,255,255,255)
+        back_color = random_color(color,64) if not self._enable_panda else (0,0,0,255)
         back_color_count = random.randint(1,10) if (self._enable_back_text and rand_bool()) else 0
         background_avoid_color = color if back_color_count == 0 else None
         dot_count   = random.randint(0,40) if self._enable_noise_dot else 0
